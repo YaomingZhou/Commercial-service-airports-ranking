@@ -1,0 +1,12 @@
+library(readxl)
+library(dplyr) 
+library("rDEA")
+airport <-read_excel("airport.xlsx")
+inputvar<- select(airport, 'No. of Check-in counters', 'Terminal area', 'No. of gates', 'No. of Runways', 'No. of direct routes')
+outputvar<- select(airport, 'Passenger throughput', 'No. of flights')
+model <- dea(XREF = inputvar, YREF = outputvar, X = inputvar[,], Y = outputvar[,] , model = "input", RTS = "constant") 
+result <- cbind(model$thetaOpt, model$lambda)
+rownames(result) <- airport[[4]]
+colnames(result) <- c("Efficiency", rownames(result))
+result_input<- data.frame(result)
+write.csv(result_input, "Input_model.csv")
